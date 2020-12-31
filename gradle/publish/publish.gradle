@@ -1,0 +1,60 @@
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+artifacts {
+    archives javadocJar, sourceJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Spek'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'a spekframework fork, for bugfixes on v1 branch. use proper repo for other use cases'
+                url 'https://github.com/ashishpandey/spek'
+
+                scm {
+                    connection 'scm:git:git@github.com:ashishpandey/spek.git'
+                    developerConnection 'scm:git:git@github.com:ashishpandey/spek.git'
+                    url 'https://github.com/ashishpandey/spek'
+                }
+
+                licenses {
+                    license {
+                        name 'BSD 3-Clause "New" or "Revised" License'
+                        url 'https://opensource.org/licenses/BSD-3-Clause'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'JetBrains'
+                        name 'Spek Contributors'
+                        organization 'JetBrains'
+                    }
+                    developer {
+                        id 'ashishpandey'
+                        name 'Ashish Pandey'
+                        email 'ashish@apandey.com'
+                    }
+                }
+            }
+        }
+    }
+}

@@ -24,6 +24,7 @@ buildscript {
 
 plugins {
     id "com.zoltu.git-versioning" version "3.0.2"
+    id "io.codearte.nexus-staging" version "0.22.0"
 }
 
 configurations.all {
@@ -94,4 +95,3 @@ if (hasProperty('bintray_api_key')) {
 } else {
     ext.bintrayApiKey = ''
 }
-

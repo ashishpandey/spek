@@ -33,3 +33,6 @@ task javadocJar(type: Jar, dependsOn: dokka) {
     from dokka.outputDirectory
     classifier = 'javadoc'
 }
+
+apply from: "$rootDir/gradle/publish/publish.gradle"
+
