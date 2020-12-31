@@ -63,7 +63,7 @@ afterEvaluate {
 
 
 allprojects {
-    group = 'org.jetbrains.spek'
+    group = 'com.apandey.forks.spek'
     repositories {
         mavenCentral()
         mavenCentral()

@@ -110,8 +110,15 @@ class SpekTestEngine: HierarchicalTestEngine<SpekExecutionContext>() {
         )
         engineDescriptor.addChild(root)
 
-        instance.spec.invoke(Collector(root, lifecycleManager, fixtures))
-
+        val rootCollector = Collector(root, lifecycleManager, fixtures)
+        try {
+            instance.spec.invoke(rootCollector)
+        } catch (e: Throwable) {
+            root.addChild(Scope.Test(
+                    root.uniqueId.append(TEST_SEGMENT_TYPE, "Discovery failure"),
+                    Pending.No, getSource(), lifecycleManager, { throw e }
+            ))
+        }
     }
 
     private fun instanceFactoryFor(spek: KClass<*>): InstanceFactory {
