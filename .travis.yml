@@ -4,6 +4,6 @@ jdk:
 before_install:
   - chmod +x gradlew
 install:
-  - ./gradlew assemble -x signArchives
+  - ./gradlew assemble
 script:
   - ./gradlew check
