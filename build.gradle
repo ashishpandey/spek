@@ -95,3 +95,8 @@ if (hasProperty('bintray_api_key')) {
 } else {
     ext.bintrayApiKey = ''
 }
+
+nexusStaging {
+    username = "${ossrhUsername}"
+    password = "${ossrhPassword}"
+}

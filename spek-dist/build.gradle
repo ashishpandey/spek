@@ -1,14 +1,6 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url 'https://jetbrains.jfrog.io/jetbrains/plugins-release'
-            credentials {
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-            }
-        }
-
     }
     dependencies {
         //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
@@ -19,8 +11,7 @@ buildscript {
 apply plugin: 'base'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: "com.jfrog.artifactory"
+apply plugin: 'signing'
 
 apply from: "$rootDir/gradle/common/dependencies.gradle"
 
@@ -28,11 +19,13 @@ description = 'Spek Distribution packages'
 
 evaluationDependsOn ':spek-api'
 evaluationDependsOn ':spek-junit-platform-engine'
+evaluationDependsOn ':spek-subject-extension'
+evaluationDependsOn ':spek-data-driven-extension'
 
 publishing {
     publications {
         api(MavenPublication) {
-            groupId = 'org.jetbrains.spek'
+            groupId = rootProject.group
             artifactId = 'spek-api'
             version = rootProject.version
 
@@ -74,7 +67,7 @@ publishing {
         }
 
         subjectExtension(MavenPublication) {
-            groupId = 'org.jetbrains.spek'
+            groupId = rootProject.group
             artifactId = 'spek-subject-extension'
             version = rootProject.version
 
@@ -116,7 +109,7 @@ publishing {
         }
 
         dataDrivenExtension(MavenPublication) {
-            groupId = 'org.jetbrains.spek'
+            groupId = rootProject.group
             artifactId = 'spek-data-driven-extension'
             version = rootProject.version
 
@@ -158,7 +151,7 @@ publishing {
         }
 
         engine(MavenPublication) {
-            groupId = 'org.jetbrains.spek'
+            groupId = rootProject.group
             artifactId = 'spek-junit-platform-engine'
             version = rootProject.version
 
@@ -199,55 +192,22 @@ publishing {
             }
         }
     }
+    repositories {
+        maven {
+            url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            credentials {
+                username = "${ossrhUsername}"
+                password = "${ossrhPassword}"
+            }
+        }
+    }
 }
 
-bintray {
-    user = "${bintrayUser}"
-    key = "${bintrayApiKey}"
-    publish = false
-
-    pkg {
-        repo = 'spek'
-        desc = "Specification framework for the JVM"
-        name = 'spek1'
-        userOrg = 'spekframework'
-        licenses = ['BSD New']
-        labels = ['kotlin', 'testing', 'specification-framework']
-        vcsUrl = 'https://github.com/spekframework/spek.git'
-
-        githubRepo = 'spekframework/spek'
-
-
-        version {
-            name = rootProject.version
-        }
-    }
-
-    publications = ['api', 'engine', 'subjectExtension', 'dataDrivenExtension']
-}
-
-artifactory {
-    if ([artifactory_contextUrl, artifactory_user, artifactory_password].contains("nothing")) {
-        return
-    }
-    contextUrl = "${artifactory_contextUrl}"
-    publish {
-        repository {
-            repoKey = 'spek-snapshots'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-            maven = true
-        }
-        defaults {
-            publications('api', 'engine', 'subjectExtension', 'dataDrivenExtension')
-        }
-    }
-    resolve {
-        repository {
-            repoKey = 'libs-release'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-            maven = true
-        }
-    }
+signing {
+    sign(
+        publishing.publications.api,
+        publishing.publications.engine,
+        publishing.publications.subjectExtension,
+        publishing.publications.dataDrivenExtension
+    )
 }
